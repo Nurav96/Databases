@@ -23,6 +23,7 @@ After setting runtime variables, execute java as detailed:
 
 	java -cp path-to-jar-file.jar:. java-file
 
-If accessing database from a remote destination, follow these instructions:
+If accessing database from a remote destination, follow these instructions: (not working yet)
 
-	
+	javac -cp path-to-jsch-jar:path-to-jdbc-jar:. java-file
+	java -cp path-to-jsch-jar:path-to-jdbc-jar:. java-file
