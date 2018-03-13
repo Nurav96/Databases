@@ -1,0 +1,28 @@
+Lab 6: JDBC Database Connectivity
+
+CSC365-01 Professor Von Dollen
+
+Group Members:
+	Varun Iyengar
+	Shannon Fong
+
+To connect to local database, use the following commands: (personal use, please ignore if instructor)
+
+	export APP_JDBC_URL=jdbc:mysql://localhost:3306/sys?autoReconnect=true
+	export APP_JDBC_USER=root
+	export APP_JDBC_PW=(computer password)
+
+To connect to remote database, use the following instructions:
+
+	export APP_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/viyengar?autoReconnect=true
+	export APP_JDBC_USER=viyengar
+	export APP_JDBC_PW=365W18_009710593
+
+
+After setting runtime variables, execute java as detailed:
+
+	java -cp path-to-jar-file.jar:. java-file
+
+If accessing database from a remote destination, follow these instructions:
+
+	
