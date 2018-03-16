@@ -7,6 +7,7 @@
 import javax.sql.*;
 import java.sql.*;
 import java.io.*;
+import java.sql.Date;
 import java.util.*;
 
 
@@ -45,6 +46,7 @@ public class InnReservations {
 			case "Revenue":
 			case "R":
 				System.out.println("Revenue\n");
+				displayRevenue();
 				break;
 
 			case "Display Tables":
@@ -162,6 +164,50 @@ public class InnReservations {
 		}
 	}
 
+    public static void displayRevenue(){
+        String jdbcURL = System.getenv("APP_JDBC_URL");
+        String dbUsername = System.getenv("APP_JDBC_USER");
+        String dbPassword = System.getenv("APP_JDBC_PW");
+        Connection conn = null;
+        PreparedStatement ps = null;
+        Calendar checkIn = Calendar.getInstance();
+        Calendar checkOut = Calendar.getInstance();
+        int[] dateStats;
+
+        try {
+            conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
+            ps = conn.prepareStatement("SELECT * FROM lab6_reservations");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                int roomCode = rs.getInt("CODE");
+                checkIn.setTime(rs.getDate("CheckIn"));
+                checkOut.setTime(rs.getDate("Checkout"));
+                float rate = rs.getFloat("Rate");
+                if ((dateStats = getDateStats(checkIn, checkOut))[0] + dateStats[1] > 0) {
+                    System.out.format("%s, %s\n", rs.getDate("CheckIn"), rs.getDate("Checkout"));
+                    System.out.format("%d %d %d %f %.2f\n", roomCode, dateStats[0], dateStats[1], rate, costOfStay(dateStats, rate));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if(ps != null){
+                try{
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            if(conn != null) {
+                try{
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+    }
+
 
 	public static void makeConnection(){
 		String jdbcURL = System.getenv("APP_JDBC_URL");
@@ -176,4 +222,28 @@ public class InnReservations {
 			System.out.println("Varun");
 		}
 	}
+
+    public static int[] getDateStats(Calendar start, Calendar end) {
+        int weekDays = 0;
+	    int weekendDays = 0;
+        int[] stayStats = new int[2];
+
+        while (start.compareTo(end) < 0 ) {
+            if (start.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY ||
+                    start.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY) {
+                weekendDays++;
+            } else {
+                weekDays++;
+            }
+            start.add(Calendar.HOUR, 24);
+        }
+
+        stayStats[0] = weekDays;
+        stayStats[1] = weekendDays;
+        return stayStats;
+    }
+
+    public static double costOfStay(int[] stayStats, float rate) {
+	    return (stayStats[0] + stayStats[1] * 1.1) * rate * 1.18;
+    }
 }
