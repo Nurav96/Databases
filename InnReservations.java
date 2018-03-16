@@ -135,43 +135,26 @@ public class InnReservations {
             System.out.println("Enter Information:");
             System.out.print("Start date(YYYY-MM-DD): ");
             String start = sc.nextLine().trim();
-            System.out.print("End date(YYYY-MM-DD: ");
+            System.out.print("End date(YYYY-MM-DD): ");
             String end = sc.nextLine().trim();
             if (!start.equals("") && !end.equals("")) {
                 ps = conn.prepareStatement("SELECT * FROM lab6_reservations WHERE FirstName LIKE ? " +
-                        "AND LastName LIKE ? AND (Checkin BETWEEN DATE(?) AND DATE(?)) AND Room LIKE ? AND CODE LIKE ?");
+                        "AND LastName LIKE ? AND ((CheckIn BETWEEN DATE(?) AND DATE(?)) OR (CheckOut BETWEEN DATE(?) AND DATE(?)) OR" +
+                        "(DATEDIFF(CheckIn, DATE(?)) <= 0 AND DATEDIFF(CheckOut, Date(?)) >= 0)) AND Room LIKE ? AND CODE LIKE ?");
                 ps.setString(3, String.format("%s", start));
                 ps.setString(4, String.format("%s", end));
+                ps.setString(5, String.format("%s", start));
+                ps.setString(6, String.format("%s", end));
+                ps.setString(7, String.format("%s", start));
+                ps.setString(8, String.format("%s", end));
                 System.out.print("Room code: ");
                 s = sc.nextLine().trim();
-                ps.setString(5, s.equals("") ? "%" : s);
+                ps.setString(9, s.equals("") ? "%" : s);
 
                 System.out.print("Reservation code: ");
                 s = sc.nextLine().trim();
-                ps.setString(6, s.equals("") ? "%" : s);
+                ps.setString(10, s.equals("") ? "%" : s);
 
-            } else if (!start.equals("")) {
-                ps = conn.prepareStatement("SELECT * FROM lab6_reservations WHERE FirstName LIKE ? " +
-                        "AND LastName LIKE ? AND DATEDIFF(CheckIn, DATE(?)) > 0 AND Room LIKE ? AND CODE LIKE ?");
-                ps.setString(3, String.format("%s", start));
-                System.out.print("Room code: ");
-                s = sc.nextLine().trim();
-                ps.setString(4, s.equals("") ? "%" : s);
-
-                System.out.print("Reservation code: ");
-                s = sc.nextLine().trim();
-                ps.setString(5, s.equals("") ? "%" : s);
-            } else if (!end.equals("")) {
-                ps = conn.prepareStatement("SELECT * FROM lab6_reservations WHERE FirstName LIKE ? " +
-                        "AND LastName LIKE ? AND DATEDIFF(DATE(?), CheckIn) > 0 AND Room LIKE ? AND CODE LIKE ?");
-                ps.setString(3, String.format("%s", end));
-                System.out.print("Room code: ");
-                s = sc.nextLine().trim();
-                ps.setString(4, s.equals("") ? "%" : s);
-
-                System.out.print("Reservation code: ");
-                s = sc.nextLine().trim();
-                ps.setString(5, s.equals("") ? "%" : s);
             } else {
                 ps = conn.prepareStatement("SELECT * FROM lab6_reservations WHERE FirstName LIKE ? " +
                         "AND LastName LIKE ? AND Room LIKE ? AND CODE LIKE ?");
@@ -211,7 +194,6 @@ public class InnReservations {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {
-            sc.close();
             if(ps != null){
                 try{
                     ps.close();
