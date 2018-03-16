@@ -85,11 +85,21 @@ public class InnReservations {
 	
 		try {
 			conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
-			ps = conn.prepareStatement("SELECT ROUND(SUM(sub)/180, 2) AS rate FROM(SELECT CheckIn, Checkout, (Checkout - CheckIn) AS sub FROM lab6_reservations WHERE (CheckIn >= DATE_SUB(NOW(), INTERVAL 180 day) OR CheckOut >= DATE_SUB(NOW(), INTERVAL 180 day)) AND (CheckIn < NOW() OR CheckOut < NOW()) AND Room = \"HBB\") as P;");
+			ps = conn.prepareStatement("SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor, ROUND(SUM(DATEDIFF(Checkout, CheckIn))/180, 2) AS Room_Popularity_Score , (SELECT R1.Checkout FROM lab6_reservations R1 WHERE Room = RoomCode AND R1.Checkout >= Now() AND R1.Checkout NOT IN (SELECT CheckIn FROM lab6_reservations R2 WHERE Room = RoomCode AND R1.Checkout >= Now()) LIMIT 1) AS Next_Avail_Date, (SELECT DATEDIFF(Checkout, CheckIn) FROM lab6_reservations WHERE Checkout <= NOW() AND Room = RoomCode ORDER BY Checkout DESC LIMIT 1) AS Last_Duration, (SELECT Checkout FROM lab6_reservations WHERE Checkout <= NOW() AND Room = RoomCode ORDER BY Checkout DESC LIMIT 1) AS Last_Checkout FROM lab6_reservations AS Resv JOIN lab6_rooms AS R ON Resv.Room = R.RoomCode WHERE (CheckIn >= DATE_SUB(NOW(), INTERVAL 180 day) OR CheckOut >= DATE_SUB(NOW(), INTERVAL 180 day)) AND (CheckIn < NOW() OR CheckOut < NOW()) GROUP BY Room ORDER BY Room_Popularity_Score DESC;");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				double rate = rs.getDouble("rate");
-				System.out.format("%f\n", rate);
+				String roomCode = rs.getString("RoomCode");
+				String roomName = rs.getString("RoomName");
+				int beds = rs.getInt("Beds");
+				String bedType = rs.getString("bedType");
+				int maxOcc = rs.getInt("maxOcc");
+				double basePrice = rs.getDouble("basePrice");
+				String decor = rs.getString("decor");
+				double rate = rs.getDouble("Room_Popularity_Score");
+				java.sql.Date nextAvail = rs.getDate("Next_Avail_Date");
+				int lastDuration = rs.getInt("Last_Duration");
+				java.sql.Date lastCheckout = rs.getDate("Last_Checkout");
+				System.out.format("%s %s %d %s %d %f %s %f %s %d %s\n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, rate, nextAvail, lastDuration, lastCheckout);
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
