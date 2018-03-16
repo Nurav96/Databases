@@ -19,6 +19,9 @@ To connect to remote database, use the following instructions:
 	export APP_JDBC_PW=365W18_009710593
 
 
-After setting runtime variables, execute java as detailed:
+After setting runtime variables, compile as detailed:
+	javac InnReservations.java
 
-	java -cp path-to-jar-file.jar:. java-file
+After compiling, execute:
+
+	java -cp path-to-jdbc-jar-file.jar:. InnReservations
