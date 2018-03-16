@@ -27,6 +27,8 @@ ORDER BY Room_Popularity_Score DESC;
 --Reservations
 */
 -- Detailed Reservation Information
-
+SELECT Room, MONTH(CheckOut), COUNT(*) FROM Reservations
+WHERE YEAR(CheckOut) = YEAR(DATE("2010-09-10"))
+GROUP BY Room, MONTH(CheckOut);
 
 -- Revenue
