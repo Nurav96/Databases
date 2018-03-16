@@ -28,6 +28,7 @@ public class InnReservations {
 			case "RR":
 			case "rr":
 				System.out.println("Rooms and Rates\n");
+				getRoomsAndRates();
 				break;
 
 			case "Reservations":
@@ -73,6 +74,41 @@ public class InnReservations {
 		System.out.println("\tDetailed Reservation Information [I]");
 		System.out.println("\tRevenue [R]");
 		System.out.println("\tExit [E]\n");
+	}
+
+	public static void getRoomsAndRates(){
+		String jdbcURL = System.getenv("APP_JDBC_URL");
+		String dbUsername = System.getenv("APP_JDBC_USER");
+		String dbPassword = System.getenv("APP_JDBC_PW");
+		Connection conn = null;
+		PreparedStatement ps = null;
+	
+		try {
+			conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
+			ps = conn.prepareStatement("SELECT ROUND(SUM(sub)/180, 2) AS rate FROM(SELECT CheckIn, Checkout, (Checkout - CheckIn) AS sub FROM lab6_reservations WHERE (CheckIn >= DATE_SUB(NOW(), INTERVAL 180 day) OR CheckOut >= DATE_SUB(NOW(), INTERVAL 180 day)) AND (CheckIn < NOW() OR CheckOut < NOW()) AND Room = \"HBB\") as P;");
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				double rate = rs.getDouble("rate");
+				System.out.format("%f\n", rate);
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			if(ps != null){
+				try{
+					ps.close();
+				} catch (SQLException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+			if(conn != null) {
+				try{
+					conn.close();
+				} catch (SQLException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+		}
 	}
 
 	public static void displayTables(){
