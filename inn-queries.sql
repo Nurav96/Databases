@@ -1,4 +1,4 @@
---Rooms and Rates
+/*--Rooms and Rates
 
 --Some overlap will occur when calculating popularity as people checkout and checkin on the same date, leading to a double count
 SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor
@@ -25,7 +25,8 @@ ORDER BY Room_Popularity_Score DESC;
 
 
 --Reservations
+*/
+-- Detailed Reservation Information
 
---Detailed Reservation Information
 
---Revenue
+-- Revenue
