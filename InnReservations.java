@@ -60,9 +60,10 @@ public class InnReservations {
 
 			default:
 				System.out.println("Command not recognized, enter another:");
-				prompt();
 				break;
 		}
+
+		prompt();
 		return status;
 	}
 
