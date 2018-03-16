@@ -1,9 +1,4 @@
 --Rooms and Rates
-SELECT *, poop FROM lab6_rooms
-WHERE RoomCode IN (
-SELECT Room as poop FROM lab6_reservations
-WHERE Room = "HBB" 
-GROUP BY Room
 
 --Some overlap will occur when calculating popularity as people checkout and checkin on the same date, leading to a double count
 SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor
