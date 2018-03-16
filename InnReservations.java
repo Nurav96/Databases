@@ -41,6 +41,7 @@ public class InnReservations {
 			case "Detailed Reservation Information":
 			case "I":
 				System.out.println("Detailed Reservation Information\n");
+				displayReservations();
 				break;
 
 			case "Revenue":
@@ -123,6 +124,71 @@ public class InnReservations {
 		}
 	}
 
+	public static void displayReservations() {
+        String jdbcURL = System.getenv("APP_JDBC_URL");
+        String dbUsername = System.getenv("APP_JDBC_USER");
+        String dbPassword = System.getenv("APP_JDBC_PW");
+        Connection conn = null;
+        PreparedStatement ps = null;
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
+            ps = conn.prepareStatement("SELECT * FROM lab6_reservations WHERE FirstName LIKE ? " +
+                    "AND LastName LIKE ? ?" +
+                    "AND Room LIKE ? AND CODE LIKE ?");
+            System.out.println("Enter Information:");
+            System.out.print("First name: ");
+            ps.setString(1, "%"+sc.nextLine()+"%");
+            System.out.print("Last name: ");
+            ps.setString(2, "%"+sc.nextLine()+"%");
+            System.out.print("Start date(YYYY-MM-DD): ");
+            String start = sc.nextLine();
+            System.out.print("End date(YYYY-MM-DD: ");
+            String end = sc.nextLine();
+            ps.setString(3, "AND (CheckIn BETWEEN DATE(%s) AND DATE(%s)) ".format(start, end));
+            System.out.print("Room code: ");
+            ps.setString(4, "%"+sc.nextLine()+"%");
+            System.out.print("Reservation code: ");
+            ps.setString(5, "%"+sc.nextLine()+"%");
+
+
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                System.out.format("\nCode: %s\nRoom: %s\nCheckIn: %s\nCheckOut: %s\nRate: %s\n" +
+                        "Last, First: %s, %s\nAdults/Kids: %s, %s\n\n",
+                        rs.getString("Code"),
+                        rs.getString("Room"),
+                        rs.getString("CheckIn"),
+                        rs.getString("CheckOut"),
+                        rs.getString("Rate"),
+                        rs.getString("LastName"),
+                        rs.getString("FirstName"),
+                        rs.getString("Adults"),
+                        rs.getString("Kids"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if(ps != null){
+                try{
+                    ps.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+            if(conn != null) {
+                try{
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+    }
+
 	public static void displayTables(){
 		String jdbcURL = System.getenv("APP_JDBC_URL");
 		String dbUsername = System.getenv("APP_JDBC_USER");
@@ -185,7 +251,7 @@ public class InnReservations {
                 float rate = rs.getFloat("Rate");
                 if ((dateStats = getDateStats(checkIn, checkOut))[0] + dateStats[1] > 0) {
                     System.out.format("%s, %s\n", rs.getDate("CheckIn"), rs.getDate("Checkout"));
-                    System.out.format("%d %d %d %f %.2f\n", roomCode, dateStats[0], dateStats[1], rate, costOfStay(dateStats, rate));
+                    System.out.format("%d %d %d %.2f %.2f\n", roomCode, dateStats[0], dateStats[1], rate, costOfStay(dateStats, rate));
                 }
             }
         } catch (SQLException e) {
