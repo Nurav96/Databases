@@ -1,12 +1,6 @@
+--Rooms and Rates
 
-/*-- Rooms and Rates
-SELECT *, poop FROM lab6_rooms
-WHERE RoomCode IN (
-SELECT Room as poop FROM lab6_reservations
-WHERE Room = "HBB" 
-GROUP BY Room;
-
--- Some overlap will occur when calculating popularity as people checkout and checkin on the same date, leading to a double count
+--Some overlap will occur when calculating popularity as people checkout and checkin on the same date, leading to a double count
 SELECT RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor
 , ROUND(SUM(DATEDIFF(Checkout, CheckIn))/180, 2) AS Room_Popularity_Score 
 , (SELECT R1.Checkout FROM lab6_reservations R1
@@ -28,12 +22,10 @@ WHERE (CheckIn >= DATE_SUB(NOW(), INTERVAL 180 day) OR CheckOut >= DATE_SUB(NOW(
 AND (CheckIn < NOW() OR CheckOut < NOW())
 GROUP BY Room
 ORDER BY Room_Popularity_Score DESC;
-*/
 
--- Reservations
 
--- Detailed Reservation Information
-SELECT * FROM Reservations;
+--Reservations
 
--- Revenue
+--Detailed Reservation Information
 
+--Revenue

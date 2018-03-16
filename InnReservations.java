@@ -36,6 +36,7 @@ public class InnReservations {
 			case "RV":
 			case "rv":
 				System.out.println("Reservations\n");
+				//makeReservation();
 				break;
 
 			case "Detailed Reservation Information":
@@ -48,12 +49,6 @@ public class InnReservations {
 			case "R":
 				System.out.println("Revenue\n");
 				displayRevenue();
-				break;
-
-			case "Display Tables":
-			case "D":
-				System.out.println("Display Tables\n");
-				displayTables();
 				break;
 
 			case "Exit":
@@ -189,26 +184,40 @@ public class InnReservations {
         }
     }
 
-	public static void displayTables(){
+	public static void makeReservation(){
 		String jdbcURL = System.getenv("APP_JDBC_URL");
 		String dbUsername = System.getenv("APP_JDBC_USER");
 		String dbPassword = System.getenv("APP_JDBC_PW");
 		Connection conn = null;
 		PreparedStatement ps = null;
-	
+		String input[] = new String[8];
+
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("Reservation Form:\n")
+		System.out.print("First Name: ");
+		input[0] = sc.nextLine().trim();
+		System.out.print("Last Name: ");
+		input[1] = sc.nextLine().trim();
+		System.out.print("Room Desired (Room Code) ");
+		input[2] = sc.nextLine().trim();
+		System.out.print("Bed Type: ");
+		input[3] = sc.nextLine().trim();
+		System.out.print("Begin Date: ");
+		input[4] = sc.nextLine().trim();
+		System.out.print("End Date: ");
+		input[5] = sc.nextLine().trim();
+		System.out.print("Number of children: ");
+		input[6] = sc.nextLine().trim();
+		System.out.print("Number of adults: ");
+		input[7] = sc.nextLine().trim();
+
 		try {
 			conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
-			ps = conn.prepareStatement("SELECT * FROM lab6_rooms");
+			ps = conn.prepareStatement("");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				String roomCode = rs.getString("RoomCode");
-				String roomName = rs.getString("RoomName");
-				int beds = rs.getInt("Beds");
-				String bedType = rs.getString("bedType");
-				int maxOcc = rs.getInt("maxOcc");
-				double basePrice = rs.getDouble("basePrice");
-				String decor = rs.getString("decor");
-				System.out.format("%s %s %d %s %d %f %s\n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor);
+
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -228,6 +237,7 @@ public class InnReservations {
 				}
 			}
 		}
+		sc.close();
 	}
 
     public static void displayRevenue(){
@@ -273,21 +283,6 @@ public class InnReservations {
             }
         }
     }
-
-
-	public static void makeConnection(){
-		String jdbcURL = System.getenv("APP_JDBC_URL");
-		String dbUsername = System.getenv("APP_JDBC_USER");
-		String dbPassword = System.getenv("APP_JDBC_PW");
-	
-		try {
-			Connection conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
-		} catch (SQLException e) {
-			System.out.println("Failed SQL Connection..." + e.getMessage());
-		} finally {
-			System.out.println("Varun");
-		}
-	}
 
     public static int[] getDateStats(Calendar start, Calendar end) {
         int weekDays = 0;
