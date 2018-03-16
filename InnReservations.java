@@ -36,6 +36,7 @@ public class InnReservations {
 			case "RV":
 			case "rv":
 				System.out.println("Reservations\n");
+				makeReservation();
 				break;
 
 			case "Detailed Reservation Information":
@@ -47,12 +48,6 @@ public class InnReservations {
 			case "R":
 				System.out.println("Revenue\n");
 				displayRevenue();
-				break;
-
-			case "Display Tables":
-			case "D":
-				System.out.println("Display Tables\n");
-				displayTables();
 				break;
 
 			case "Exit":
@@ -102,47 +97,6 @@ public class InnReservations {
 				int lastDuration = rs.getInt("Last_Duration");
 				java.sql.Date lastCheckout = rs.getDate("Last_Checkout");
 				System.out.format("%s %s %d %s %d %f %s %f %s %d %s\n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor, rate, nextAvail, lastDuration, lastCheckout);
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		} finally {
-			if(ps != null){
-				try{
-					ps.close();
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-			}
-			if(conn != null) {
-				try{
-					conn.close();
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-			}
-		}
-	}
-
-	public static void displayTables(){
-		String jdbcURL = System.getenv("APP_JDBC_URL");
-		String dbUsername = System.getenv("APP_JDBC_USER");
-		String dbPassword = System.getenv("APP_JDBC_PW");
-		Connection conn = null;
-		PreparedStatement ps = null;
-	
-		try {
-			conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
-			ps = conn.prepareStatement("SELECT * FROM lab6_rooms");
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()){
-				String roomCode = rs.getString("RoomCode");
-				String roomName = rs.getString("RoomName");
-				int beds = rs.getInt("Beds");
-				String bedType = rs.getString("bedType");
-				int maxOcc = rs.getInt("maxOcc");
-				double basePrice = rs.getDouble("basePrice");
-				String decor = rs.getString("decor");
-				System.out.format("%s %s %d %s %d %f %s\n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor);
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
