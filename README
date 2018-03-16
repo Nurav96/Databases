@@ -25,3 +25,4 @@ After setting runtime variables, compile as detailed:
 After compiling, execute:
 
 	java -cp path-to-jdbc-jar-file.jar:. InnReservations
+
