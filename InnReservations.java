@@ -279,18 +279,88 @@ public class InnReservations {
 
         try {
             conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
-            ps = conn.prepareStatement("SELECT * FROM lab6_reservations");
+            ps = conn.prepareStatement("SELECT Room, MONTH(CheckOut) as `month`,\n" +
+                    "    TRUNCATE(sum((CASE WHEN weekday(CheckIn) = 6 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 0\n" +
+                    "\t\t THEN 0\n" +
+                    "\t\t WHEN weekday(CheckIn) = 6 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) < 6\n" +
+                    "\t\t THEN 1\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 0\n" +
+                    "         THEN 0\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 1\n" +
+                    "         THEN 1\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) > 1\n" +
+                    "         THEN 2\n" +
+                    "         \n" +
+                    "\t\tWHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) <= 5\n" +
+                    "\t\tTHEN 0\n" +
+                    "        \n" +
+                    "        WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) = 6\n" +
+                    "        THEN 1\n" +
+                    "        \n" +
+                    "        ELSE 2\n" +
+                    "    END +\n" +
+                    "    ((DATEDIFF(CheckOut, CheckIn)-1) DIV 7) * 1.1 +\n" +
+                    "    \n" +
+                    "    DATEDIFF(CheckOut, CheckIn) -\n" +
+                    "        CASE WHEN weekday(CheckIn) = 6 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 0\n" +
+                    "\t\t THEN 0\n" +
+                    "\t\t WHEN weekday(CheckIn) = 6 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) < 6\n" +
+                    "\t\t THEN 1\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 0\n" +
+                    "         THEN 0\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) = 1\n" +
+                    "         THEN 1\n" +
+                    "         \n" +
+                    "\t\t WHEN weekday(CheckIn) = 5 AND\n" +
+                    "              (DATEDIFF(CheckOut, CheckIn) % 7) > 1\n" +
+                    "         THEN 2\n" +
+                    "         \n" +
+                    "\t\tWHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) <= 5\n" +
+                    "\t\tTHEN 0\n" +
+                    "        \n" +
+                    "        WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) = 6\n" +
+                    "        THEN 1\n" +
+                    "        \n" +
+                    "        ELSE 2\n" +
+                    "    END +\n" +
+                    "    ((DATEDIFF(CheckOut, CheckIn)-1) DIV 7)) * rate), 2) as `revenue`\n" +
+                    "FROM lab6_reservations\n" +
+                    "WHERE YEAR(CheckOut) = YEAR(CURDATE())\n"+
+                    "GROUP BY Room, MONTH(CheckOut);");
             ResultSet rs = ps.executeQuery();
+            String old = "";
+            float sum = 0;
             while(rs.next()){
-                int roomCode = rs.getInt("CODE");
-                checkIn.setTime(rs.getDate("CheckIn"));
-                checkOut.setTime(rs.getDate("Checkout"));
-                float rate = rs.getFloat("Rate");
-                if ((dateStats = getDateStats(checkIn, checkOut))[0] + dateStats[1] > 0) {
-                    System.out.format("%s, %s\n", rs.getDate("CheckIn"), rs.getDate("Checkout"));
-                    System.out.format("%d %d %d %.2f %.2f\n", roomCode, dateStats[0], dateStats[1], rate, costOfStay(dateStats, rate));
+                if (old.equals("")) {
+                    old = rs.getString("Room");
                 }
+                if (!old.equals("") && !old.equals(rs.getString("Room"))) {
+                    old = rs.getString("Room");
+                    System.out.format("Total Revenue: %.2f\n", sum);
+                    sum=0;
+                }
+                sum += rs.getFloat("revenue");
+                System.out.format("Room: %s, Month: %s, Revenue: %.2f\n", rs.getString("Room"), rs.getString("month"), rs.getFloat("revenue"));
+
             }
+            if (!old.equals("")) {
+                System.out.format("Total Revenue: %.2f\n", sum);
+            }
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         } finally {

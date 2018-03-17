@@ -27,8 +27,66 @@ ORDER BY Room_Popularity_Score DESC;
 --Reservations
 */
 -- Detailed Reservation Information
-SELECT Room, MONTH(CheckOut), COUNT(*) FROM Reservations
-WHERE YEAR(CheckOut) = YEAR(DATE("2010-09-10"))
+SELECT Room, MONTH(CheckOut),
+    TRUNCATE(sum((CASE WHEN weekday(CheckIn) = 6 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 0
+		 THEN 0
+		 WHEN weekday(CheckIn) = 6 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) < 6
+		 THEN 1
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 0
+         THEN 0
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 1
+         THEN 1
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) > 1
+         THEN 2
+         
+		WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) <= 5
+		THEN 0
+        
+        WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) = 6
+        THEN 1
+        
+        ELSE 2
+    END +
+    ((DATEDIFF(CheckOut, CheckIn)-1) DIV 7) * 1.1 +
+    
+    DATEDIFF(CheckOut, CheckIn) -
+        CASE WHEN weekday(CheckIn) = 6 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 0
+		 THEN 0
+		 WHEN weekday(CheckIn) = 6 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) < 6
+		 THEN 1
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 0
+         THEN 0
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) = 1
+         THEN 1
+         
+		 WHEN weekday(CheckIn) = 5 AND
+              (DATEDIFF(CheckOut, CheckIn) % 7) > 1
+         THEN 2
+         
+		WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) <= 5
+		THEN 0
+        
+        WHEN weekday(CheckIn) + (DATEDIFF(CheckOut, CheckIn) % 7) = 6
+        THEN 1
+        
+        ELSE 2
+    END +
+    ((DATEDIFF(CheckOut, CheckIn)-1) DIV 7)) * rate), 2)
+FROM Reservations
 GROUP BY Room, MONTH(CheckOut);
 
 -- Revenue
