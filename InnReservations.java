@@ -36,7 +36,7 @@ public class InnReservations {
 			case "RV":
 			case "rv":
 				System.out.println("Reservations\n");
-				//makeReservation();
+				makeReservation();
 				break;
 
 			case "Detailed Reservation Information":
@@ -216,7 +216,8 @@ public class InnReservations {
 		String dbUsername = System.getenv("APP_JDBC_USER");
 		String dbPassword = System.getenv("APP_JDBC_PW");
 		Connection conn = null;
-		PreparedStatement ps = null;
+		PreparedStatement ps1 = null;
+		PreparedStatement ps2 = null;
 		String input[] = new String[8];
 
 		Scanner sc = new Scanner(System.in);
@@ -243,76 +244,76 @@ public class InnReservations {
 			conn = DriverManager.getConnection(jdbcURL, dbUsername, dbPassword);
 
 			if(input[2].equals("Any") && input[3].equals("Any")){
-				ps = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode NOT IN("+
+				ps1 = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode NOT IN("+
 					" SELECT R1.Room FROM lab6_reservations R1 JOIN lab6_reservations R2 ON R1.Room = R2.Room"+
-					" WHERE (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout)"+
-					" OR (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout"+
+					" WHERE (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout)"+
+					" OR (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout"+
 					" AND (R1.CheckIn = R2.Checkout OR R1.Checkout = R2.CheckIn)));");
-				ps.setString(2, input[4]);
-				ps.setString(3, input[4]);
-				ps.setString(4, input[4]);
-				ps.setString(5, input[4]);
-				ps.setString(6, input[5]);
-				ps.setString(7, input[5]);
-				ps.setString(8, input[5]);
-				ps.setString(9, input[5]);		
+				ps1.setString(2, input[4]);
+				ps1.setString(3, input[4]);
+				ps1.setString(4, input[4]);
+				ps1.setString(5, input[4]);
+				ps1.setString(6, input[5]);
+				ps1.setString(7, input[5]);
+				ps1.setString(8, input[5]);
+				ps1.setString(9, input[5]);		
 			} else if (input[2].equals("Any")) {
-				ps = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE bedType = ? AND RoomCode NOT IN ("+
+				ps1 = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE bedType = ? AND RoomCode NOT IN ("+
 					" SELECT R1.Room FROM lab6_reservations R1 JOIN lab6_reservations R2 ON R1.Room = R2.Room"+
-					" WHERE (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout)"+
-					" OR (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout"+
+					" WHERE (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout)"+
+					" OR (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout"+
 					" AND (R1.CheckIn = R2.Checkout OR R1.Checkout = R2.CheckIn)));");
-				ps.setString(1, input[3]);
-				ps.setString(2, input[4]);
-				ps.setString(3, input[4]);
-				ps.setString(4, input[4]);
-				ps.setString(5, input[4]);
-				ps.setString(6, input[5]);
-				ps.setString(7, input[5]);
-				ps.setString(8, input[5]);
-				ps.setString(9, input[5]);			
+				ps1.setString(1, input[3]);
+				ps1.setString(2, input[4]);
+				ps1.setString(3, input[4]);
+				ps1.setString(4, input[4]);
+				ps1.setString(5, input[4]);
+				ps1.setString(6, input[5]);
+				ps1.setString(7, input[5]);
+				ps1.setString(8, input[5]);
+				ps1.setString(9, input[5]);			
 			} else if (input[3].equals("Any")) {
-				ps = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode = ? AND RoomCode NOT IN (("+
+				ps1 = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode = ? AND RoomCode NOT IN (("+
 					" SELECT R1.Room FROM lab6_reservations R1 JOIN lab6_reservations R2 ON R1.Room = R2.Room"+
-					" WHERE (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout)"+
-					" OR (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout"+
+					" WHERE (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout)"+
+					" OR (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout"+
 					" AND (R1.CheckIn = R2.Checkout OR R1.Checkout = R2.CheckIn)));");
-				ps.setString(1, input[2]);
-				ps.setString(2, input[4]);
-				ps.setString(3, input[4]);
-				ps.setString(4, input[4]);
-				ps.setString(5, input[4]);
-				ps.setString(6, input[5]);
-				ps.setString(7, input[5]);
-				ps.setString(8, input[5]);
-				ps.setString(9, input[5]);		
+				ps1.setString(1, input[2]);
+				ps1.setString(2, input[4]);
+				ps1.setString(3, input[4]);
+				ps1.setString(4, input[4]);
+				ps1.setString(5, input[4]);
+				ps1.setString(6, input[5]);
+				ps1.setString(7, input[5]);
+				ps1.setString(8, input[5]);
+				ps1.setString(9, input[5]);		
 			} else {
-				ps = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode = ? AND bedType = ? AND RoomCode NOT IN ("+
+				ps1 = conn.prepareStatement("SELECT * FROM lab6_rooms WHERE RoomCode = ? AND bedType = ? AND RoomCode NOT IN ("+
 					" SELECT R1.Room FROM lab6_reservations R1 JOIN lab6_reservations R2 ON R1.Room = R2.Room"+
-					" WHERE (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout)"+
-					" OR (STR_TO_DATE('?', '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R1.Checkout"+
-					" AND STR_TO_DATE('?', '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE('?', '%Y-%m-%d') <= R2.Checkout"+
+					" WHERE (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout)"+
+					" OR (STR_TO_DATE(?, '%Y-%m-%d') >= R1.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R1.Checkout"+
+					" AND STR_TO_DATE(?, '%Y-%m-%d') >= R2.CheckIn AND STR_TO_DATE(?, '%Y-%m-%d') <= R2.Checkout"+
 					" AND (R1.CheckIn = R2.Checkout OR R1.Checkout = R2.CheckIn)));");
-				ps.setString(1, input[2]);
-				ps.setString(2, input[3]);
-				ps.setString(3, input[4]);
-				ps.setString(4, input[4]);
-				ps.setString(5, input[4]);
-				ps.setString(6, input[4]);
-				ps.setString(7, input[5]);
-				ps.setString(8, input[5]);
-				ps.setString(9, input[5]);
-				ps.setString(10, input[5]);
+				ps1.setString(1, input[2]);
+				ps1.setString(2, input[3]);
+				ps1.setString(3, input[4]);
+				ps1.setString(4, input[4]);
+				ps1.setString(5, input[4]);
+				ps1.setString(6, input[4]);
+				ps1.setString(7, input[5]);
+				ps1.setString(8, input[5]);
+				ps1.setString(9, input[5]);
+				ps1.setString(10, input[5]);
 			}
 
-			ResultSet rs = ps.executeQuery();
+			ResultSet rs = ps1.executeQuery();
 			int rowNum = 1;
 
 			System.out.println("Select Room to Reserve:\n");
@@ -328,7 +329,7 @@ public class InnReservations {
 				rowNum++;
 			}
 
-			int rowSelected = Integer.parseInt(sc.nextLine().trim());
+			int rowSelected = sc.nextInt();
 			rs.absolute(rowSelected);
 			String roomCode = rs.getString("RoomCode");
 			String roomName = rs.getString("RoomName");
@@ -337,14 +338,56 @@ public class InnReservations {
 			int maxOcc = rs.getInt("maxOcc");
 			double basePrice = rs.getDouble("basePrice");
 			String decor = rs.getString("decor");
-			System.out.format("You Selected: \n%s %s %d %s %d %f %s\n", roomCode, roomName, beds, bedType, maxOcc, basePrice, decor);
+
+			int totalPersons = Integer.parseInt(input[6]) + Integer.parseInt(input[7]);
+			if(totalPersons > maxOcc){
+				System.out.println("WARNING: Cannot reserve room, too many persons. Please try placing multiple reservations.\n");
+			} else {
+				Calendar checkIn = Calendar.getInstance();
+				Calendar checkOut = Calendar.getInstance();
+				int[] dateStats;
+				checkIn.setTime(java.sql.Date.valueOf(input[4]));
+				checkOut.setTime(java.sql.Date.valueOf(input[5]));
+				dateStats = getDateStats(checkIn, checkOut);
+				double totalCost = costOfStay(dateStats, (float)basePrice);
+				System.out.format("Confirmation:\nFirst Name: %s\nLast Name: %s\n"+
+					"Room Code: %s\nRoom Name: %s\nBed Type: %s\n"+
+					"Begin date: %s\nEnd date: %s\nNumber of Adults: %s\n"+
+					"Number of Children: %s\nTotal Cost: %f\n\n",
+					input[0], input[1], roomCode, roomName, bedType, input[4], input[5],
+					input[7], input[6], totalCost);
+				System.out.println("Would you like to confirm this reservation? (Y/n)");
+				String confirmed = sc.next();
+				if(confirmed.equals("Y")){
+					Random rand = new Random();
+					ps2 = conn.prepareStatement("INSERT INTO lab6_reservations VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);");
+					ps2.setInt(1, rand.nextInt(1000000));
+					ps2.setString(2, roomCode);
+					ps2.setDate(3, java.sql.Date.valueOf(input[4]));
+					ps2.setDate(4, java.sql.Date.valueOf(input[5]));
+					ps2.setDouble(5, totalCost);
+					ps2.setString(6, input[1]);
+					ps2.setString(7, input[0]);
+					ps2.setInt(8, Integer.parseInt(input[7]));
+					ps2.setInt(9, Integer.parseInt(input[6]));
+
+					ps2.execute();	
+				}
+			}
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		} finally {
-			if(ps != null){
+			if(ps1 != null){
 				try{
-					ps.close();
+					ps1.close();
+				} catch (SQLException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+			if(ps2 != null){
+				try{
+					ps2.close();
 				} catch (SQLException e) {
 					System.out.println(e.getMessage());
 				}
@@ -357,7 +400,6 @@ public class InnReservations {
 				}
 			}
 		}
-		sc.close();
 	}
 
     public static void displayRevenue(){
